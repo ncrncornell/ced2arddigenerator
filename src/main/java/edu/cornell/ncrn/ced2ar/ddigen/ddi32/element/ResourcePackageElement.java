@@ -1,8 +1,10 @@
 package edu.cornell.ncrn.ced2ar.ddigen.ddi32.element;
 
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.category.CategorySchemeElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.code.CodeListScheme;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.logical.LogicalProductElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalDataProduct;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalInstance;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.VariableSchemeElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,13 +17,21 @@ public class ResourcePackageElement extends ElementWithUrn {
 	public static final String NODE_NAME_RESOURCE_PACKAGE = "g:ResourcePackage";
 
 	private CodeListScheme codeListScheme;
+	private List<CategorySchemeElement> categorySchemeList = new ArrayList<>();
 	private Purpose purpose;
 	private LogicalProductElement logicalProduct;
 	private PhysicalDataProduct physicalDataProduct;
+	private PhysicalInstance physicalInstance;
 	private List<VariableSchemeElement> variableSchemeList = new ArrayList<>();
 
 	public ResourcePackageElement(String agency) {
 		super(agency);
+	}
+
+	public void addCategoryScheme(CategorySchemeElement categoryScheme) {
+		synchronized (categorySchemeList) {
+			categorySchemeList.add(categoryScheme);
+		}
 	}
 
 	public void addVariableSchemeList(VariableSchemeElement variableSchemeElement) {
@@ -45,7 +55,13 @@ public class ResourcePackageElement extends ElementWithUrn {
 		// Physical Data Product
 		getPhysicalDataProduct().appendToElement(resourcePackage, doc);
 
+		// Physical Instance
+		getPhysicalInstance().appendToElement(resourcePackage, doc);
+
 		// Category Scheme
+		for (CategorySchemeElement categoryScheme : getCategorySchemeList()) {
+			categoryScheme.appendToElement(resourcePackage, doc);
+		}
 
 		// Code List Scheme
 		getCodeListScheme().appendToElement(resourcePackage, doc);
@@ -58,6 +74,10 @@ public class ResourcePackageElement extends ElementWithUrn {
 		element.appendChild(resourcePackage);
 	}
 
+	public List<CategorySchemeElement> getCategorySchemeList() {
+		return categorySchemeList;
+	}
+
 	public CodeListScheme getCodeListScheme() {
 		return codeListScheme;
 	}
@@ -68,6 +88,10 @@ public class ResourcePackageElement extends ElementWithUrn {
 
 	public PhysicalDataProduct getPhysicalDataProduct() {
 		return physicalDataProduct;
+	}
+
+	public PhysicalInstance getPhysicalInstance() {
+		return physicalInstance;
 	}
 
 	public Purpose getPurpose() {
@@ -88,6 +112,10 @@ public class ResourcePackageElement extends ElementWithUrn {
 
 	public void setPhysicalDataProduct(PhysicalDataProduct physicalDataProduct) {
 		this.physicalDataProduct = physicalDataProduct;
+	}
+
+	public void setPhysicalInstance(PhysicalInstance physicalInstance) {
+		this.physicalInstance = physicalInstance;
 	}
 
 	public void setPurpose(Purpose purpose) {

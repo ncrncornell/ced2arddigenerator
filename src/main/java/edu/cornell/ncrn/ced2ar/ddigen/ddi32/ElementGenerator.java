@@ -1,8 +1,12 @@
 package edu.cornell.ncrn.ced2ar.ddigen.ddi32;
 
 import edu.cornell.ncrn.ced2ar.ddigen.AbstractSchemaGenerator;
+import edu.cornell.ncrn.ced2ar.ddigen.category.Category;
 import edu.cornell.ncrn.ced2ar.ddigen.csv.Ced2arVariableStat;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.DDIInstance;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.Label;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.category.CategoryElement;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.category.CategorySchemeElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.logical.DataRelationshipElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.logical.LogicalProductElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.logical.LogicalRecordElement;
@@ -14,15 +18,21 @@ import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.code.CodeListElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.code.CodeListScheme;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.code.CodeListSchemeReference;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.BasedOnObject;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.GrossFileStructure;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.GrossRecordStructure;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalDataProduct;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalInstance;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalRecordSegment;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalStructure;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalStructureScheme;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.StatisticalSummary;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.SummaryStatistic;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.VariableStatistics;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.DataItem;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.ProprietaryInfo;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.ProprietaryProperty;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.RecordLayout;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.RecordLayoutReference;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.RecordLayoutScheme;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.VariableSchemeReference;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.CodeVariableRepresentation;
@@ -30,6 +40,7 @@ import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.DateTimeVariableRep
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.NumericVariableRepresentation;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.TextVariableRepresentation;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.VariableElement;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.VariableReference;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.VariableSchemeElement;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.VariableUsedReference;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.variable.VariablesInRecordElement;
@@ -104,9 +115,21 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		);
 		resourcePackage.setPhysicalDataProduct(physicalDataProduct);
 
-		// TODO: Physical Instance
+		// Physical Instance
+		PhysicalInstance physicalInstance = getPhysicalInstance();
+		resourcePackage.setPhysicalInstance(physicalInstance);
 
-		// TODO: Category Scheme
+		// Category Schemes
+		for (CategoryScheme categoryScheme : getCategorySchemeList()) {
+			UUID categorySchemeId = categorySchemeIdToUuidMap.get(categoryScheme.getId());
+			CategorySchemeElement categorySchemeElement = new CategorySchemeElement(categorySchemeId.toString(), getAgency());
+			for (Category category : categoryScheme.getCategoryList()) {
+				UUID categoryId = categoryIdToUuidMap.get(category.getId());
+				CategoryElement categoryElement = new CategoryElement(categoryId.toString(), getAgency());
+				categorySchemeElement.addCategoryElement(categoryElement);
+			}
+			resourcePackage.addCategoryScheme(categorySchemeElement);
+		}
 
 		// Code List Schemes
 		CodeListScheme codeListScheme = new CodeListScheme(getAgency());
@@ -194,6 +217,35 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		logicalRecord.setLogicalProductName(getTitle());
 
 		return logicalRecord;
+	}
+
+	protected PhysicalInstance getPhysicalInstance() {
+		PhysicalInstance physicalInstance = new PhysicalInstance(getAgency());
+
+		// Gross File Structure
+		GrossFileStructure grossFileStructure = new GrossFileStructure(getAgency());
+		grossFileStructure.setSoftwareName("name");
+		grossFileStructure.setDescription(new Label(GrossFileStructure.NODE_NAME_DESCRIPTION, "label", getDdiLanguage()));
+		physicalInstance.setGrossRecordStructure(grossFileStructure);
+
+		// Record Layout Reference
+		physicalInstance.setRecordLayoutReference(new RecordLayoutReference("id", getAgency()));
+
+		// Statistical Summary
+		StatisticalSummary statisticalSummary = new StatisticalSummary(getAgency());
+
+		for (Ced2arVariableStat stat : getVariableStatisticList()) {
+			VariableStatistics variableStatistics = new VariableStatistics(getAgency());
+			variableStatistics.setVariableReference(new VariableReference("id", getAgency()));
+
+			variableStatistics.addSummaryStatistic(new SummaryStatistic(getAgency()));
+
+			statisticalSummary.addVariableStatistics(variableStatistics);
+		}
+
+		physicalInstance.setStatisticalSummary(statisticalSummary);
+
+		return physicalInstance;
 	}
 
 	protected PhysicalDataProduct getPhysicalDataProduct() {

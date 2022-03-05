@@ -11,15 +11,23 @@ public class Label implements Appendable {
 
 	private String content;
 	private String ddiLanguage;
+	private String label;
 
 	public Label(String content, String ddiLanguage) {
+		setContent(content);
+		setDdiLanguage(ddiLanguage);
+		setLabel(NODE_NAME_LABEL);
+	}
+
+	public Label(String label ,String content, String ddiLanguage) {
+		setLabel(label);
 		setContent(content);
 		setDdiLanguage(ddiLanguage);
 	}
 
 	@Override
 	public void appendToElement(Element element, Document doc) {
-		Element label = doc.createElement(NODE_NAME_LABEL);
+		Element label = doc.createElement(getLabel());
 
 		Element content = doc.createElement(NODE_NAME_CONTENT);
 		content.setTextContent(getContent());
@@ -37,11 +45,19 @@ public class Label implements Appendable {
 		return ddiLanguage;
 	}
 
+	public String getLabel() {
+		return label;
+	}
+
 	public void setContent(String content) {
 		this.content = content;
 	}
 
 	public void setDdiLanguage(String ddiLanguage) {
 		this.ddiLanguage = ddiLanguage;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }
