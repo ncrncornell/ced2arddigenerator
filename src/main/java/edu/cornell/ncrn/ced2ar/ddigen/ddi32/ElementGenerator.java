@@ -99,8 +99,11 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		resourcePackage.setPurpose(new Purpose());
 
 		// Logical Product
+		String logicalRecordId = UUID.randomUUID().toString();
+
 		resourcePackage.setLogicalProduct(
 			getLogicalProduct(
+				logicalRecordId,
 				categorySchemeIdToUuidMap,
 				codeListIdToUuidMap,
 				variableIdToUuidMap,
@@ -109,8 +112,8 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		);
 
 		// Physical Data Product
-		PhysicalDataProduct physicalDataProduct = getPhysicalDataProduct();
-		UUID variableSchemeId = UUID.randomUUID();
+		PhysicalDataProduct physicalDataProduct = getPhysicalDataProduct(logicalRecordId);
+		String variableSchemeId = UUID.randomUUID().toString();
 		physicalDataProduct.setRecordLayoutScheme(
 			getRecordLayoutScheme(variableSchemeId, variableIdToUuidMap)
 		);
@@ -165,6 +168,7 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 	}
 
 	protected LogicalProductElement getLogicalProduct(
+		String logicalRecordId,
 		Map<String, UUID> categorySchemeIdToUuidMap,
 		Map<String, UUID> codeListIdToUuidMap,
 		Map<String, UUID> variableIdToUuidMap,
@@ -254,7 +258,7 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		return physicalInstance;
 	}
 
-	protected PhysicalDataProduct getPhysicalDataProduct() {
+	protected PhysicalDataProduct getPhysicalDataProduct(String logicalRecordId) {
 		PhysicalDataProduct physicalDataProduct = new PhysicalDataProduct(getAgency());
 
 		PhysicalStructureScheme physicalStructureScheme = new PhysicalStructureScheme(getAgency());
@@ -270,7 +274,7 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		// Gross Record Structure
 		GrossRecordStructure grossRecordStructure = new GrossRecordStructure(getAgency());
 
-		grossRecordStructure.setLogicalRecordReference(UUID.randomUUID().toString());
+		grossRecordStructure.setLogicalRecordReference(logicalRecordId);
 		grossRecordStructure.setPhysicalRecordSegment(new PhysicalRecordSegment(getAgency()));
 
 		physicalStructure.setGrossRecordStructure(grossRecordStructure);
@@ -282,10 +286,10 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 		return physicalDataProduct;
 	}
 
-	protected RecordLayoutScheme getRecordLayoutScheme(UUID variableSchemeId, Map<String, UUID> variableIdToUuidMap) {
+	protected RecordLayoutScheme getRecordLayoutScheme(String variableSchemeId, Map<String, UUID> variableIdToUuidMap) {
 		RecordLayoutScheme recordLayoutScheme = new RecordLayoutScheme(getAgency());
 
-		RecordLayout recordLayout = new RecordLayout(getAgency(), variableSchemeId.toString());
+		RecordLayout recordLayout = new RecordLayout(getAgency(), variableSchemeId);
 
 		// Physical Structure Link Reference
 		recordLayout.setReference("id");
