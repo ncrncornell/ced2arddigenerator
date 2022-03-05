@@ -27,6 +27,7 @@ import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalStructure;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.PhysicalStructureScheme;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.StatisticalSummary;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.SummaryStatistic;
+import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.SummaryStatisticType;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.physical.VariableStatistics;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.DataItem;
 import edu.cornell.ncrn.ced2ar.ddigen.ddi32.element.record.ProprietaryInfo;
@@ -238,7 +239,12 @@ public class ElementGenerator extends AbstractSchemaGenerator {
 			VariableStatistics variableStatistics = new VariableStatistics(getAgency());
 			variableStatistics.setVariableReference(new VariableReference("id", getAgency()));
 
-			variableStatistics.addSummaryStatistic(new SummaryStatistic(getAgency()));
+			variableStatistics.addSummaryStatistic(SummaryStatisticType.Maximum, stat.getMaxFormatted());
+			variableStatistics.addSummaryStatistic(SummaryStatisticType.Minimum, stat.getMinFormatted());
+			variableStatistics.addSummaryStatistic(SummaryStatisticType.Mean, stat.getMeanFormatted());
+			variableStatistics.addSummaryStatistic(SummaryStatisticType.Mode, "0");
+			variableStatistics.addSummaryStatistic(SummaryStatisticType.Valid, stat.getValidCount().toString());
+			variableStatistics.addSummaryStatistic(SummaryStatisticType.Invalid, stat.getInvalidCount().toString());
 
 			statisticalSummary.addVariableStatistics(variableStatistics);
 		}

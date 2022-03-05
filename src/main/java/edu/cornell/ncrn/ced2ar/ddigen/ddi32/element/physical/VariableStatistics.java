@@ -19,9 +19,9 @@ public class VariableStatistics extends ElementWithUrn {
 		super(agency);
 	}
 
-	public void addSummaryStatistic(SummaryStatistic summaryStatistic) {
+	public void addSummaryStatistic(SummaryStatisticType type, String statistic) {
 		synchronized (this.summaryStatisticList) {
-			this.summaryStatisticList.add(summaryStatistic);
+			this.summaryStatisticList.add(new SummaryStatistic(type, statistic, getAgency()));
 		}
 	}
 

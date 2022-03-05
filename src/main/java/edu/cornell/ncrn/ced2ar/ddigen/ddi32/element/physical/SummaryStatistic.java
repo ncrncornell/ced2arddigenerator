@@ -10,11 +10,14 @@ public class SummaryStatistic extends ElementWithUrn {
 	public static final String NODE_NAME_TYPE_OF_SUMMARY_STATISTIC = "pi:TypeOfSummaryStatistic";
 	public static final String NODE_NAME_STATISTIC = "pi:Statistic";
 
-	private String type;
+	private SummaryStatisticType type;
 	private String statistic;
 
-	public SummaryStatistic(String agency) {
+	public SummaryStatistic(SummaryStatisticType type, String statistic, String agency) {
 		super(agency);
+
+		setStatistic(statistic);
+		setType(type);
 	}
 
 	@Override
@@ -23,7 +26,7 @@ public class SummaryStatistic extends ElementWithUrn {
 
 		// Type Of Summary Statistic
 		Element type = doc.createElement(NODE_NAME_TYPE_OF_SUMMARY_STATISTIC);
-		type.setTextContent(getType());
+		type.setTextContent(getType().toString());
 		summaryStatistic.appendChild(type);
 
 		// Statistic
@@ -38,7 +41,7 @@ public class SummaryStatistic extends ElementWithUrn {
 		return statistic;
 	}
 
-	public String getType() {
+	public SummaryStatisticType getType() {
 		return type;
 	}
 
@@ -46,7 +49,7 @@ public class SummaryStatistic extends ElementWithUrn {
 		this.statistic = statistic;
 	}
 
-	public void setType(String type) {
+	public void setType(SummaryStatisticType type) {
 		this.type = type;
 	}
 }
